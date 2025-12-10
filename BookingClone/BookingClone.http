@@ -1,4 +1,4 @@
-@BookingClone_HostAddress = http://localhost:5174
+@BookingClone_HostAddress = http://localhost:5100
 
 GET {{BookingClone_HostAddress}}/weatherforecast/
 Accept: application/json

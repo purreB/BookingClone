@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookingClone", "BookingClone\BookingClone.csproj", "{EDEF86C1-DC02-42A0-92DE-44149978585E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EDEF86C1-DC02-42A0-92DE-44149978585E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDEF86C1-DC02-42A0-92DE-44149978585E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDEF86C1-DC02-42A0-92DE-44149978585E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDEF86C1-DC02-42A0-92DE-44149978585E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
