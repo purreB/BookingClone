@@ -6,22 +6,15 @@ namespace BookingClone.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class HotelRoomController : ControllerBase
+public class HotelRoomController(IHotelRoomService roomService) : ControllerBase
 {
-    private readonly IHotelRoomService _roomService;
-
-    public HotelRoomController(IHotelRoomService roomService)
-    {
-        _roomService = roomService;
-    }
-
     [HttpGet("hotel/{hotelId}")]
-    public IEnumerable<HotelRoomDto> GetRoomsByHotel(Guid hotelId) => _roomService.GetRoomsByHotelId(hotelId);
+    public IEnumerable<HotelRoomDto> GetRoomsByHotel(Guid hotelId) => roomService.GetRoomsByHotelId(hotelId);
 
     [HttpGet("{id}")]
     public ActionResult<HotelRoomDto> GetById(Guid id)
     {
-        var room = _roomService.GetRoomById(id);
+        var room = roomService.GetRoomById(id);
         if (room == null) return NotFound();
         return room;
     }
@@ -29,21 +22,21 @@ public class HotelRoomController : ControllerBase
     [HttpPost]
     public IActionResult Add(HotelRoomDto room)
     {
-        _roomService.AddRoom(room);
+        roomService.AddRoom(room);
         return CreatedAtAction(nameof(GetById), new { id = room.Id }, room);
     }
 
     [HttpPut]
     public IActionResult Update(HotelRoomDto room)
     {
-        _roomService.UpdateRoom(room);
+        roomService.UpdateRoom(room);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public IActionResult Delete(Guid id)
     {
-        _roomService.DeleteRoom(id);
+        roomService.DeleteRoom(id);
         return NoContent();
     }
 }

@@ -6,19 +6,12 @@ namespace BookingClone.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserController : ControllerBase
+public class UserController(IUserService userService) : ControllerBase
 {
-    private readonly IUserService _userService;
-
-    public UserController(IUserService userService)
-    {
-        _userService = userService;
-    }
-
     [HttpGet("guest/{id}")]
     public ActionResult<GuestDto> GetGuestById(Guid id)
     {
-        var guest = _userService.GetGuestById(id);
+        var guest = userService.GetGuestById(id);
         if (guest == null) return NotFound();
         return guest;
     }
@@ -26,7 +19,7 @@ public class UserController : ControllerBase
     [HttpGet("staff/{id}")]
     public ActionResult<StaffUserDto> GetStaffById(Guid id)
     {
-        var staff = _userService.GetStaffById(id);
+        var staff = userService.GetStaffById(id);
         if (staff == null) return NotFound();
         return staff;
     }
@@ -34,42 +27,42 @@ public class UserController : ControllerBase
     [HttpPost("guest")]
     public IActionResult AddGuest(GuestDto guest)
     {
-        _userService.AddGuest(guest);
+        userService.AddGuest(guest);
         return CreatedAtAction(nameof(GetGuestById), new { id = guest.Id }, guest);
     }
 
     [HttpPost("staff")]
     public IActionResult AddStaff(StaffUserDto staff)
     {
-        _userService.AddStaff(staff);
+        userService.AddStaff(staff);
         return CreatedAtAction(nameof(GetStaffById), new { id = staff.Id }, staff);
     }
 
     [HttpPut("guest")]
     public IActionResult UpdateGuest(GuestDto guest)
     {
-        _userService.UpdateGuest(guest);
+        userService.UpdateGuest(guest);
         return NoContent();
     }
 
     [HttpPut("staff")]
     public IActionResult UpdateStaff(StaffUserDto staff)
     {
-        _userService.UpdateStaff(staff);
+        userService.UpdateStaff(staff);
         return NoContent();
     }
 
     [HttpDelete("guest/{id}")]
     public IActionResult DeleteGuest(Guid id)
     {
-        _userService.DeleteGuest(id);
+        userService.DeleteGuest(id);
         return NoContent();
     }
 
     [HttpDelete("staff/{id}")]
     public IActionResult DeleteStaff(Guid id)
     {
-        _userService.DeleteStaff(id);
+        userService.DeleteStaff(id);
         return NoContent();
     }
 }
