@@ -7,4 +7,5 @@ public class HotelRoomDto
     public string Type { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public bool IsAvailable { get; set; }
+    public Guid HotelId { get; set; }
 }
