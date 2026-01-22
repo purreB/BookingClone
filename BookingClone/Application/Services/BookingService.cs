@@ -5,14 +5,8 @@ using BookingClone.Infrastructure.Repositories;
 
 namespace BookingClone.Application.Services
 {
-    public class BookingService : IBookingService
+    public class BookingService(IBookingRepository bookingRepository) : IBookingService
     {
-        private readonly IBookingRepository _bookingRepository;
-
-        public BookingService(IBookingRepository bookingRepository)
-        {
-            _bookingRepository = bookingRepository;
-        }
 
         public IEnumerable<BookingDto> GetAllBookings()
         {
@@ -38,7 +32,7 @@ namespace BookingClone.Application.Services
 
         public void DeleteBooking(Guid id)
         {
-            _bookingRepository.Delete(id);
+            bookingRepository.Delete(id);
         }
     }
 }
