@@ -8,5 +8,6 @@ public class HotelRoom
     public decimal Price { get; set; }
     public bool IsAvailable { get; set; }
     public Guid HotelId { get; set; }
+    public Hotel Hotel { get; set; } = null!;
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 }

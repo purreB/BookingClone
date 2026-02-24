@@ -2,12 +2,12 @@ namespace BookingClone.Domain;
 
 public interface IUserRepository
 {
-    Guest? GetGuestById(Guid id);
-    StaffUser? GetStaffById(Guid id);
-    void AddGuest(Guest guest);
-    void AddStaff(StaffUser staff);
-    void UpdateGuest(Guest guest);
-    void UpdateStaff(StaffUser staff);
-    void DeleteGuest(Guid id);
-    void DeleteStaff(Guid id);
+    Task<Guest?> GetGuestByIdAsync(Guid id);
+    Task<StaffUser?> GetStaffByIdAsync(Guid id);
+    Task AddGuestAsync(Guest guest);
+    Task AddStaffAsync(StaffUser staff);
+    Task UpdateGuestAsync(Guest guest);
+    Task UpdateStaffAsync(StaffUser staff);
+    Task DeleteGuestAsync(Guid id);
+    Task DeleteStaffAsync(Guid id);
 }

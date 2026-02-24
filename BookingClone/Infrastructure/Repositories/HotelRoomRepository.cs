@@ -1,18 +1,36 @@
+using Microsoft.EntityFrameworkCore;
 using BookingClone.Domain;
+using BookingClone.Infrastructure.Data;
 
 namespace BookingClone.Infrastructure.Repositories;
 
-public class HotelRoomRepository : IHotelRoomRepository
+public class HotelRoomRepository(BookingCloneDbContext context) : IHotelRoomRepository
 {
-    private readonly List<HotelRoom> _rooms = new();
+    public async Task<IEnumerable<HotelRoom>> GetByHotelIdAsync(Guid hotelId) =>
+        await context.HotelRooms.Where(r => r.HotelId == hotelId).ToListAsync();
 
-    public HotelRoom? GetById(Guid id) => _rooms.FirstOrDefault(r => r.Id == id);
-    public IEnumerable<HotelRoom> GetByHotelId(Guid hotelId) => _rooms.Where(r => r.HotelId == hotelId);
-    public void Add(HotelRoom room) => _rooms.Add(room);
-    public void Update(HotelRoom room)
+    public async Task<HotelRoom?> GetByIdAsync(Guid id) =>
+        await context.HotelRooms.FirstOrDefaultAsync(r => r.Id == id);
+
+    public async Task AddAsync(HotelRoom room)
     {
-        var idx = _rooms.FindIndex(r => r.Id == room.Id);
-        if (idx >= 0) _rooms[idx] = room;
+        context.HotelRooms.Add(room);
+        await context.SaveChangesAsync();
     }
-    public void Delete(Guid id) => _rooms.RemoveAll(r => r.Id == id);
+
+    public async Task UpdateAsync(HotelRoom room)
+    {
+        context.HotelRooms.Update(room);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var room = await context.HotelRooms.FindAsync(id);
+        if (room != null)
+        {
+            context.HotelRooms.Remove(room);
+            await context.SaveChangesAsync();
+        }
+    }
 }

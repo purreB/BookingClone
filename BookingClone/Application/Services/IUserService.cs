@@ -4,12 +4,12 @@ namespace BookingClone.Application.Services;
 
 public interface IUserService
 {
-    GuestDto? GetGuestById(Guid id);
-    StaffUserDto? GetStaffById(Guid id);
-    void AddGuest(GuestDto guest);
-    void AddStaff(StaffUserDto staff);
-    void UpdateGuest(GuestDto guest);
-    void UpdateStaff(StaffUserDto staff);
-    void DeleteGuest(Guid id);
-    void DeleteStaff(Guid id);
+    Task<GuestDto?> GetGuestByIdAsync(Guid id);
+    Task<StaffUserDto?> GetStaffByIdAsync(Guid id);
+    Task<GuestDto> AddGuestAsync(GuestDto guest);
+    Task<StaffUserDto> AddStaffAsync(StaffUserDto staff);
+    Task UpdateGuestAsync(GuestDto guest);
+    Task UpdateStaffAsync(StaffUserDto staff);
+    Task DeleteGuestAsync(Guid id);
+    Task DeleteStaffAsync(Guid id);
 }

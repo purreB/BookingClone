@@ -2,9 +2,9 @@ namespace BookingClone.Domain;
 
 public interface IHotelRoomRepository
 {
-    HotelRoom? GetById(Guid id);
-    IEnumerable<HotelRoom> GetByHotelId(Guid hotelId);
-    void Add(HotelRoom room);
-    void Update(HotelRoom room);
-    void Delete(Guid id);
+    Task<IEnumerable<HotelRoom>> GetByHotelIdAsync(Guid hotelId);
+    Task<HotelRoom?> GetByIdAsync(Guid id);
+    Task AddAsync(HotelRoom room);
+    Task UpdateAsync(HotelRoom room);
+    Task DeleteAsync(Guid id);
 }

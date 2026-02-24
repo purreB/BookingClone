@@ -1,48 +1,58 @@
+using AutoMapper;
 using BookingClone.Application.DTOs;
 using BookingClone.Domain;
 
 namespace BookingClone.Application.Services;
 
-public class UserService(IUserRepository userRepository) : IUserService
+public class UserService(IUserRepository userRepository, IMapper mapper) : IUserService
 {
-    public GuestDto? GetGuestById(Guid id)
+    public async Task<GuestDto?> GetGuestByIdAsync(Guid id)
     {
-        var guest = userRepository.GetGuestById(id);
-        if (guest == null) return null;
-        return new GuestDto { Id = guest.Id, Name = guest.Name, Email = guest.Email };
+        var guest = await userRepository.GetGuestByIdAsync(id);
+        return guest == null ? null : mapper.Map<GuestDto>(guest);
     }
 
-    public StaffUserDto? GetStaffById(Guid id)
+    public async Task<StaffUserDto?> GetStaffByIdAsync(Guid id)
     {
-        var staff = userRepository.GetStaffById(id);
-        if (staff == null) return null;
-        return new StaffUserDto { Id = staff.Id, Name = staff.Name, Email = staff.Email, IsOwner = staff.IsOwner };
+        var staff = await userRepository.GetStaffByIdAsync(id);
+        return staff == null ? null : mapper.Map<StaffUserDto>(staff);
     }
 
-    public void AddGuest(GuestDto guest)
+    public async Task<GuestDto> AddGuestAsync(GuestDto guestDto)
     {
-        var entity = new Guest { Id = guest.Id, Name = guest.Name, Email = guest.Email };
-        userRepository.AddGuest(entity);
+        var guest = mapper.Map<Guest>(guestDto);
+        guest.Id = Guid.NewGuid();
+        await userRepository.AddGuestAsync(guest);
+        return mapper.Map<GuestDto>(guest);
     }
 
-    public void AddStaff(StaffUserDto staff)
+    public async Task<StaffUserDto> AddStaffAsync(StaffUserDto staffDto)
     {
-        var entity = new StaffUser { Id = staff.Id, Name = staff.Name, Email = staff.Email, IsOwner = staff.IsOwner };
-        userRepository.AddStaff(entity);
+        var staff = mapper.Map<StaffUser>(staffDto);
+        staff.Id = Guid.NewGuid();
+        await userRepository.AddStaffAsync(staff);
+        return mapper.Map<StaffUserDto>(staff);
     }
 
-    public void UpdateGuest(GuestDto guest)
+    public async Task UpdateGuestAsync(GuestDto guestDto)
     {
-        var entity = new Guest { Id = guest.Id, Name = guest.Name, Email = guest.Email };
-        userRepository.UpdateGuest(entity);
+        var guest = mapper.Map<Guest>(guestDto);
+        await userRepository.UpdateGuestAsync(guest);
     }
 
-    public void UpdateStaff(StaffUserDto staff)
+    public async Task UpdateStaffAsync(StaffUserDto staffDto)
     {
-        var entity = new StaffUser { Id = staff.Id, Name = staff.Name, Email = staff.Email, IsOwner = staff.IsOwner };
-        userRepository.UpdateStaff(entity);
+        var staff = mapper.Map<StaffUser>(staffDto);
+        await userRepository.UpdateStaffAsync(staff);
     }
 
-    public void DeleteGuest(Guid id) => userRepository.DeleteGuest(id);
-    public void DeleteStaff(Guid id) => userRepository.DeleteStaff(id);
+    public async Task DeleteGuestAsync(Guid id)
+    {
+        await userRepository.DeleteGuestAsync(id);
+    }
+
+    public async Task DeleteStaffAsync(Guid id)
+    {
+        await userRepository.DeleteStaffAsync(id);
+    }
 }

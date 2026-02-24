@@ -1,33 +1,39 @@
+using AutoMapper;
 using BookingClone.Application.DTOs;
 using BookingClone.Domain;
 
 namespace BookingClone.Application.Services;
 
-public class HotelService(IHotelRepository hotelRepository) : IHotelService
+public class HotelService(IHotelRepository hotelRepository, IMapper mapper) : IHotelService
 {
-    public HotelDto? GetHotelById(Guid id)
+    public async Task<IEnumerable<HotelDto>> GetAllHotelsAsync()
     {
-        var hotel = hotelRepository.GetById(id);
-        if (hotel == null) return null;
-        return new HotelDto { Id = hotel.Id, Name = hotel.Name, Address = hotel.Address };
+        var hotels = await hotelRepository.GetAllAsync();
+        return mapper.Map<IEnumerable<HotelDto>>(hotels);
     }
 
-    public IEnumerable<HotelDto> GetAllHotels()
+    public async Task<HotelDto?> GetHotelByIdAsync(Guid id)
     {
-        return hotelRepository.GetAll().Select(h => new HotelDto { Id = h.Id, Name = h.Name, Address = h.Address });
+        var hotel = await hotelRepository.GetByIdAsync(id);
+        return hotel == null ? null : mapper.Map<HotelDto>(hotel);
     }
 
-    public void AddHotel(HotelDto hotel)
+    public async Task<HotelDto> AddHotelAsync(HotelDto hotelDto)
     {
-        var entity = new Hotel { Id = hotel.Id, Name = hotel.Name, Address = hotel.Address };
-        hotelRepository.Add(entity);
+        var hotel = mapper.Map<Hotel>(hotelDto);
+        hotel.Id = Guid.NewGuid();
+        await hotelRepository.AddAsync(hotel);
+        return mapper.Map<HotelDto>(hotel);
     }
 
-    public void UpdateHotel(HotelDto hotel)
+    public async Task UpdateHotelAsync(HotelDto hotelDto)
     {
-        var entity = new Hotel { Id = hotel.Id, Name = hotel.Name, Address = hotel.Address };
-        hotelRepository.Update(entity);
+        var hotel = mapper.Map<Hotel>(hotelDto);
+        await hotelRepository.UpdateAsync(hotel);
     }
 
-    public void DeleteHotel(Guid id) => hotelRepository.Delete(id);
+    public async Task DeleteHotelAsync(Guid id)
+    {
+        await hotelRepository.DeleteAsync(id);
+    }
 }

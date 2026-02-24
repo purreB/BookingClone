@@ -1,38 +1,43 @@
-using System.Collections.Generic;
+using AutoMapper;
 using BookingClone.Application.DTOs;
 using BookingClone.Domain;
-using BookingClone.Infrastructure.Repositories;
 
-namespace BookingClone.Application.Services
+namespace BookingClone.Application.Services;
+
+public class BookingService(IBookingRepository bookingRepository, IMapper mapper) : IBookingService
 {
-    public class BookingService(IBookingRepository bookingRepository) : IBookingService
+    public async Task<IEnumerable<BookingDto>> GetAllBookingsAsync()
     {
+        var bookings = await bookingRepository.GetAllAsync();
+        return mapper.Map<IEnumerable<BookingDto>>(bookings);
+    }
 
-        public IEnumerable<BookingDto> GetAllBookings()
-        {
-            // Map Booking to BookingDto
-            return new List<BookingDto>();
-        }
+    public async Task<BookingDto?> GetBookingByIdAsync(Guid id)
+    {
+        var booking = await bookingRepository.GetByIdAsync(id);
+        return booking == null ? null : mapper.Map<BookingDto>(booking);
+    }
 
-        public BookingDto GetBookingById(Guid id)
-        {
-            // Map Booking to BookingDto
-            return new BookingDto();
-        }
+    public async Task<BookingDto> CreateBookingAsync(BookingDto bookingDto)
+    {
+        var booking = mapper.Map<Booking>(bookingDto);
+        booking.Id = Guid.NewGuid();
+        booking.CreatedAt = DateTime.UtcNow;
+        booking.Status = BookingStatus.Pending;
+        
+        await bookingRepository.AddAsync(booking);
+        
+        return mapper.Map<BookingDto>(booking);
+    }
 
-        public void CreateBooking(BookingDto bookingDto)
-        {
-            // Map BookingDto to Booking and save
-        }
+    public async Task UpdateBookingAsync(BookingDto bookingDto)
+    {
+        var booking = mapper.Map<Booking>(bookingDto);
+        await bookingRepository.UpdateAsync(booking);
+    }
 
-        public void UpdateBooking(BookingDto bookingDto)
-        {
-            // Map BookingDto to Booking and update
-        }
-
-        public void DeleteBooking(Guid id)
-        {
-            bookingRepository.Delete(id);
-        }
+    public async Task DeleteBookingAsync(Guid id)
+    {
+        await bookingRepository.DeleteAsync(id);
     }
 }

@@ -5,6 +5,7 @@ public class Hotel
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
-    public List<HotelRoom> Rooms { get; set; } = new();
+    public Guid OwnerId { get; set; }
     public StaffUser Owner { get; set; } = null!;
+    public List<HotelRoom> Rooms { get; set; } = [];
 }

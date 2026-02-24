@@ -6,37 +6,41 @@ namespace BookingClone.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BookingController(IBookingService _bookingService) : ControllerBase
+public class BookingController(IBookingService bookingService) : ControllerBase
 {
     [HttpGet]
-    public IEnumerable<BookingDto> GetAll() => _bookingService.GetAllBookings();
+    public async Task<ActionResult<IEnumerable<BookingDto>>> GetAll()
+    {
+        var bookings = await bookingService.GetAllBookingsAsync();
+        return Ok(bookings);
+    }
 
     [HttpGet("{id}")]
-    public ActionResult<BookingDto> Get(Guid id)
+    public async Task<ActionResult<BookingDto>> Get(Guid id)
     {
-        var booking = _bookingService.GetBookingById(id);
-        if (booking == null) return NotFound();
+        var booking = await bookingService.GetBookingByIdAsync(id);
+        if (booking is null) return NotFound();
         return booking;
     }
 
     [HttpPost]
-    public IActionResult Add(BookingDto bookingDto)
+    public async Task<IActionResult> Create([FromBody] BookingDto bookingDto)
     {
-        _bookingService.CreateBooking(bookingDto);
-        return CreatedAtAction(nameof(Get), new { id = bookingDto.Id }, bookingDto);
+        var createdBooking = await bookingService.CreateBookingAsync(bookingDto);
+        return CreatedAtAction(nameof(Get), new { id = createdBooking.Id }, createdBooking);
     }
 
     [HttpPut]
-    public IActionResult Update(BookingDto bookingDto)
+    public async Task<IActionResult> Update([FromBody] BookingDto bookingDto)
     {
-        _bookingService.UpdateBooking(bookingDto);
+        await bookingService.UpdateBookingAsync(bookingDto);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        _bookingService.DeleteBooking(id);
+        await bookingService.DeleteBookingAsync(id);
         return NoContent();
     }
 }

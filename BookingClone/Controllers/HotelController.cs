@@ -6,37 +6,41 @@ namespace BookingClone.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class HotelController(IHotelService _hotelService) : ControllerBase
+public class HotelController(IHotelService hotelService) : ControllerBase
 {
     [HttpGet]
-    public IEnumerable<HotelDto> GetAll() => _hotelService.GetAllHotels();
+    public async Task<ActionResult<IEnumerable<HotelDto>>> GetAll()
+    {
+        var hotels = await hotelService.GetAllHotelsAsync();
+        return Ok(hotels);
+    }
 
     [HttpGet("{id}")]
-    public ActionResult<HotelDto> GetById(Guid id)
+    public async Task<ActionResult<HotelDto>> GetById(Guid id)
     {
-        var hotel = _hotelService.GetHotelById(id);
+        var hotel = await hotelService.GetHotelByIdAsync(id);
         if (hotel == null) return NotFound();
         return hotel;
     }
 
     [HttpPost]
-    public IActionResult Add(HotelDto hotel)
+    public async Task<IActionResult> Add([FromBody] HotelDto hotel)
     {
-        _hotelService.AddHotel(hotel);
-        return CreatedAtAction(nameof(GetById), new { id = hotel.Id }, hotel);
+        var createdHotel = await hotelService.AddHotelAsync(hotel);
+        return CreatedAtAction(nameof(GetById), new { id = createdHotel.Id }, createdHotel);
     }
 
     [HttpPut]
-    public IActionResult Update(HotelDto hotel)
+    public async Task<IActionResult> Update([FromBody] HotelDto hotel)
     {
-        _hotelService.UpdateHotel(hotel);
+        await hotelService.UpdateHotelAsync(hotel);
         return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        _hotelService.DeleteHotel(id);
+        await hotelService.DeleteHotelAsync(id);
         return NoContent();
     }
 }
