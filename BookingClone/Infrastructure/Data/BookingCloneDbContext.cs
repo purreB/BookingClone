@@ -37,10 +37,6 @@ public class BookingCloneDbContext(DbContextOptions<BookingCloneDbContext> optio
             entity.HasKey(r => r.Id);
             entity.Property(r => r.RoomNumber).IsRequired().HasMaxLength(50);
             entity.Property(r => r.Type).IsRequired().HasMaxLength(50);
-            entity.HasMany(r => r.Bookings)
-            .WithOne(b => b.HotelRoom)
-            .HasForeignKey(b => b.HotelRoomId)
-            .OnDelete(DeleteBehavior.Restrict);
         });
 
         // Configure Booking aggregate root
@@ -65,7 +61,6 @@ public class BookingCloneDbContext(DbContextOptions<BookingCloneDbContext> optio
             entity.HasKey(g => g.Id);
             entity.Property(g => g.Name).IsRequired().HasMaxLength(255);
             entity.Property(g => g.Email).IsRequired().HasMaxLength(255);
-            entity.HasIndex(g => g.Email).IsUnique();
         });
 
         // Configure StaffUser
@@ -74,7 +69,6 @@ public class BookingCloneDbContext(DbContextOptions<BookingCloneDbContext> optio
             entity.HasKey(s => s.Id);
             entity.Property(s => s.Name).IsRequired().HasMaxLength(255);
             entity.Property(s => s.Email).IsRequired().HasMaxLength(255);
-            entity.HasIndex(s => s.Email).IsUnique();
         });
     }
 }

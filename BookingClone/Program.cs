@@ -7,12 +7,16 @@ using BookingClone.Infrastructure.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add database
+
+var connString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+Console.WriteLine($"Connection string loaded: {connString is not null}");
+
 builder.Services.AddDbContext<BookingCloneDbContext>(options =>
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("Neon")
+        builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
-
 // Add API services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -39,7 +43,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<BookingCloneDbContext>();
-    dbContext.Database.Migrate();
+    //dbContext.Database.Migrate();
 }
 
 // Configure the HTTP request pipeline
