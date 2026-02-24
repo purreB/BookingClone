@@ -1,33 +1,39 @@
+using AutoMapper;
 using BookingClone.Application.DTOs;
 using BookingClone.Domain;
 
 namespace BookingClone.Application.Services;
 
-public class HotelRoomService(IHotelRoomRepository roomRepository) : IHotelRoomService
+public class HotelRoomService(IHotelRoomRepository roomRepository, IMapper mapper) : IHotelRoomService
 {
-    public HotelRoomDto? GetRoomById(Guid id)
+    public async Task<IEnumerable<HotelRoomDto>> GetRoomsByHotelIdAsync(Guid hotelId)
     {
-        var room = roomRepository.GetById(id);
-        if (room == null) return null;
-        return new HotelRoomDto { Id = room.Id, RoomNumber = room.RoomNumber, Type = room.Type, Price = room.Price, IsAvailable = room.IsAvailable };
+        var rooms = await roomRepository.GetByHotelIdAsync(hotelId);
+        return mapper.Map<IEnumerable<HotelRoomDto>>(rooms);
     }
 
-    public IEnumerable<HotelRoomDto> GetRoomsByHotelId(Guid hotelId)
+    public async Task<HotelRoomDto?> GetRoomByIdAsync(Guid id)
     {
-        return roomRepository.GetByHotelId(hotelId).Select(r => new HotelRoomDto { Id = r.Id, RoomNumber = r.RoomNumber, Type = r.Type, Price = r.Price, IsAvailable = r.IsAvailable });
+        var room = await roomRepository.GetByIdAsync(id);
+        return room == null ? null : mapper.Map<HotelRoomDto>(room);
     }
 
-    public void AddRoom(HotelRoomDto room)
+    public async Task<HotelRoomDto> AddRoomAsync(HotelRoomDto roomDto)
     {
-        var entity = new HotelRoom { Id = room.Id, RoomNumber = room.RoomNumber, Type = room.Type, Price = room.Price, IsAvailable = room.IsAvailable };
-        roomRepository.Add(entity);
+        var room = mapper.Map<HotelRoom>(roomDto);
+        room.Id = Guid.NewGuid();
+        await roomRepository.AddAsync(room);
+        return mapper.Map<HotelRoomDto>(room);
     }
 
-    public void UpdateRoom(HotelRoomDto room)
+    public async Task UpdateRoomAsync(HotelRoomDto roomDto)
     {
-        var entity = new HotelRoom { Id = room.Id, RoomNumber = room.RoomNumber, Type = room.Type, Price = room.Price, IsAvailable = room.IsAvailable };
-        roomRepository.Update(entity);
+        var room = mapper.Map<HotelRoom>(roomDto);
+        await roomRepository.UpdateAsync(room);
     }
 
-    public void DeleteRoom(Guid id) => roomRepository.Delete(id);
+    public async Task DeleteRoomAsync(Guid id)
+    {
+        await roomRepository.DeleteAsync(id);
+    }
 }

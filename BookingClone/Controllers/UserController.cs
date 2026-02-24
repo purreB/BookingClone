@@ -6,63 +6,63 @@ namespace BookingClone.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserController(IUserService _userService) : ControllerBase
+public class UserController(IUserService userService) : ControllerBase
 {
     [HttpGet("guest/{id}")]
-    public ActionResult<GuestDto> GetGuestById(Guid id)
+    public async Task<ActionResult<GuestDto>> GetGuestById(Guid id)
     {
-        var guest = _userService.GetGuestById(id);
+        var guest = await userService.GetGuestByIdAsync(id);
         if (guest == null) return NotFound();
         return guest;
     }
 
     [HttpGet("staff/{id}")]
-    public ActionResult<StaffUserDto> GetStaffById(Guid id)
+    public async Task<ActionResult<StaffUserDto>> GetStaffById(Guid id)
     {
-        var staff = _userService.GetStaffById(id);
+        var staff = await userService.GetStaffByIdAsync(id);
         if (staff == null) return NotFound();
         return staff;
     }
 
     [HttpPost("guest")]
-    public IActionResult AddGuest(GuestDto guest)
+    public async Task<IActionResult> AddGuest([FromBody] GuestDto guest)
     {
-        _userService.AddGuest(guest);
-        return CreatedAtAction(nameof(GetGuestById), new { id = guest.Id }, guest);
+        var createdGuest = await userService.AddGuestAsync(guest);
+        return CreatedAtAction(nameof(GetGuestById), new { id = createdGuest.Id }, createdGuest);
     }
 
     [HttpPost("staff")]
-    public IActionResult AddStaff(StaffUserDto staff)
+    public async Task<IActionResult> AddStaff([FromBody] StaffUserDto staff)
     {
-        _userService.AddStaff(staff);
-        return CreatedAtAction(nameof(GetStaffById), new { id = staff.Id }, staff);
+        var createdStaff = await userService.AddStaffAsync(staff);
+        return CreatedAtAction(nameof(GetStaffById), new { id = createdStaff.Id }, createdStaff);
     }
 
     [HttpPut("guest")]
-    public IActionResult UpdateGuest(GuestDto guest)
+    public async Task<IActionResult> UpdateGuest([FromBody] GuestDto guest)
     {
-        _userService.UpdateGuest(guest);
+        await userService.UpdateGuestAsync(guest);
         return NoContent();
     }
 
     [HttpPut("staff")]
-    public IActionResult UpdateStaff(StaffUserDto staff)
+    public async Task<IActionResult> UpdateStaff([FromBody] StaffUserDto staff)
     {
-        _userService.UpdateStaff(staff);
+        await userService.UpdateStaffAsync(staff);
         return NoContent();
     }
 
     [HttpDelete("guest/{id}")]
-    public IActionResult DeleteGuest(Guid id)
+    public async Task<IActionResult> DeleteGuest(Guid id)
     {
-        _userService.DeleteGuest(id);
+        await userService.DeleteGuestAsync(id);
         return NoContent();
     }
 
     [HttpDelete("staff/{id}")]
-    public IActionResult DeleteStaff(Guid id)
+    public async Task<IActionResult> DeleteStaff(Guid id)
     {
-        _userService.DeleteStaff(id);
+        await userService.DeleteStaffAsync(id);
         return NoContent();
     }
 }

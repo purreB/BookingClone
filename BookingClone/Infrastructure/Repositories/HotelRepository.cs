@@ -1,18 +1,36 @@
+using Microsoft.EntityFrameworkCore;
 using BookingClone.Domain;
+using BookingClone.Infrastructure.Data;
 
 namespace BookingClone.Infrastructure.Repositories;
 
-public class HotelRepository : IHotelRepository
+public class HotelRepository(BookingCloneDbContext context) : IHotelRepository
 {
-    private readonly List<Hotel> _hotels = new();
+    public async Task<IEnumerable<Hotel>> GetAllAsync() =>
+        await context.Hotels.ToListAsync();
 
-    public Hotel? GetById(Guid id) => _hotels.FirstOrDefault(h => h.Id == id);
-    public IEnumerable<Hotel> GetAll() => _hotels;
-    public void Add(Hotel hotel) => _hotels.Add(hotel);
-    public void Update(Hotel hotel)
+    public async Task<Hotel?> GetByIdAsync(Guid id) =>
+        await context.Hotels.FirstOrDefaultAsync(h => h.Id == id);
+
+    public async Task AddAsync(Hotel hotel)
     {
-        var idx = _hotels.FindIndex(h => h.Id == hotel.Id);
-        if (idx >= 0) _hotels[idx] = hotel;
+        context.Hotels.Add(hotel);
+        await context.SaveChangesAsync();
     }
-    public void Delete(Guid id) => _hotels.RemoveAll(h => h.Id == id);
+
+    public async Task UpdateAsync(Hotel hotel)
+    {
+        context.Hotels.Update(hotel);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var hotel = await context.Hotels.FindAsync(id);
+        if (hotel != null)
+        {
+            context.Hotels.Remove(hotel);
+            await context.SaveChangesAsync();
+        }
+    }
 }

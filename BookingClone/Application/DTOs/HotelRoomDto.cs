@@ -1,5 +1,8 @@
+
+using TypeGen.Core.TypeAnnotations;
 namespace BookingClone.Application.DTOs;
 
+[ExportTsClass]
 public class HotelRoomDto
 {
     public Guid Id { get; set; }

@@ -1,24 +1,48 @@
+using Microsoft.EntityFrameworkCore;
+using BookingClone.Application.Services;
+using BookingClone.Domain;
+using BookingClone.Infrastructure.Data;
+using BookingClone.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add database
+builder.Services.AddDbContext<BookingCloneDbContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("Neon")
+    )
+);
+
+// Add API services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Add services to the container.
 builder.Services.AddControllers();
 
+// Add AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
 
-// Dependency Injection for Onion Architecture
-builder.Services.AddSingleton<BookingClone.Domain.IHotelRepository, BookingClone.Infrastructure.Repositories.HotelRepository>();
-builder.Services.AddSingleton<BookingClone.Domain.IHotelRoomRepository, BookingClone.Infrastructure.Repositories.HotelRoomRepository>();
-builder.Services.AddSingleton<BookingClone.Domain.IUserRepository, BookingClone.Infrastructure.Repositories.UserRepository>();
+// Register repositories (Domain layer dependencies)
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IHotelRepository, HotelRepository>();
+builder.Services.AddScoped<IHotelRoomRepository, HotelRoomRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-builder.Services.AddSingleton<BookingClone.Application.Services.IHotelService, BookingClone.Application.Services.HotelService>();
-builder.Services.AddSingleton<BookingClone.Application.Services.IHotelRoomService, BookingClone.Application.Services.HotelRoomService>();
-builder.Services.AddSingleton<BookingClone.Application.Services.IUserService, BookingClone.Application.Services.UserService>();
+// Register application services (Business logic layer)
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IHotelService, HotelService>();
+builder.Services.AddScoped<IHotelRoomService, HotelRoomService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Apply migrations and seed data
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<BookingCloneDbContext>();
+    dbContext.Database.Migrate();
+}
+
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -26,9 +50,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
+

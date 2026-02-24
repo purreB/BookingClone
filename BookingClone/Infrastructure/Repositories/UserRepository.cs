@@ -1,26 +1,58 @@
+using Microsoft.EntityFrameworkCore;
 using BookingClone.Domain;
+using BookingClone.Infrastructure.Data;
 
 namespace BookingClone.Infrastructure.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository(BookingCloneDbContext context) : IUserRepository
 {
-    private readonly List<Guest> _guests = new();
-    private readonly List<StaffUser> _staff = new();
+    public async Task<Guest?> GetGuestByIdAsync(Guid id) =>
+        await context.Guests.FirstOrDefaultAsync(g => g.Id == id);
 
-    public Guest? GetGuestById(Guid id) => _guests.FirstOrDefault(g => g.Id == id);
-    public StaffUser? GetStaffById(Guid id) => _staff.FirstOrDefault(s => s.Id == id);
-    public void AddGuest(Guest guest) => _guests.Add(guest);
-    public void AddStaff(StaffUser staff) => _staff.Add(staff);
-    public void UpdateGuest(Guest guest)
+    public async Task<StaffUser?> GetStaffByIdAsync(Guid id) =>
+        await context.StaffUsers.FirstOrDefaultAsync(s => s.Id == id);
+
+    public async Task AddGuestAsync(Guest guest)
     {
-        var idx = _guests.FindIndex(g => g.Id == guest.Id);
-        if (idx >= 0) _guests[idx] = guest;
+        context.Guests.Add(guest);
+        await context.SaveChangesAsync();
     }
-    public void UpdateStaff(StaffUser staff)
+
+    public async Task AddStaffAsync(StaffUser staff)
     {
-        var idx = _staff.FindIndex(s => s.Id == staff.Id);
-        if (idx >= 0) _staff[idx] = staff;
+        context.StaffUsers.Add(staff);
+        await context.SaveChangesAsync();
     }
-    public void DeleteGuest(Guid id) => _guests.RemoveAll(g => g.Id == id);
-    public void DeleteStaff(Guid id) => _staff.RemoveAll(s => s.Id == id);
+
+    public async Task UpdateGuestAsync(Guest guest)
+    {
+        context.Guests.Update(guest);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task UpdateStaffAsync(StaffUser staff)
+    {
+        context.StaffUsers.Update(staff);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteGuestAsync(Guid id)
+    {
+        var guest = await context.Guests.FindAsync(id);
+        if (guest != null)
+        {
+            context.Guests.Remove(guest);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public async Task DeleteStaffAsync(Guid id)
+    {
+        var staff = await context.StaffUsers.FindAsync(id);
+        if (staff != null)
+        {
+            context.StaffUsers.Remove(staff);
+            await context.SaveChangesAsync();
+        }
+    }
 }

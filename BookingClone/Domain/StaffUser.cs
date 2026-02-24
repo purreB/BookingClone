@@ -7,4 +7,5 @@ public class StaffUser
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
     public bool IsOwner { get; set; }
+    public ICollection<Hotel> OwnedHotels { get; set; } = new List<Hotel>();
 }
