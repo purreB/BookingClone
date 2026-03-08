@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BookingClone.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class HotelRoomController(IHotelRoomService roomService) : ControllerBase
 {
     [HttpGet("hotel/{hotelId}")]
