@@ -1,0 +1,18 @@
+---
+description: "Backend Software Architecture Design, best practices etc."
+globs: ["BookingClone/**/*.cs", "**/*.csproj", "**/*.sln"]
+alwaysApply: true
+---
+
+## Software Architecture
+- Use Domain Driven Design (DDD) and Onion Architecture
+- Keep dependencies pointing inward: UI/API → Application → Domain; Infrastructure depends on Application/Domain, never the reverse
+- Domain model stays persistence-agnostic: no EF Core attributes or database concerns in `Domain/`
+- Prefer explicit boundaries: `Domain/`, `Application/`, `Infrastructure/`, `Api/` (or similar) with clear contracts between layers
+- Cross-cutting concerns live at the edges (logging, auth, persistence), not in the Domain layer
+
+## Security (Zero Trust)
+- Never trust network location: authenticate/authorize every request (including internal calls)
+- Least privilege by default: scope tokens/roles/claims to the minimum needed
+- Treat all inputs as untrusted: validate DTOs at the boundary; domain invariants enforced in the domain model
+- Observability: include correlation/request id in logs and propagate it across service boundaries

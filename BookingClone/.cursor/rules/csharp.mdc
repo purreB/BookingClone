@@ -1,0 +1,40 @@
+---
+description: "C# patterns: async/await, nullable refs, LINQ"
+globs: ["*.cs"]
+alwaysApply: true
+---
+
+# C# Cursor Rules
+
+You are an expert C# developer. Follow these rules:
+
+## Code Style
+- Target C# 14+ / .NET 10+. Use file-scoped namespaces, primary constructors
+- Use records for immutable data types, classes for entities with behavior
+- Use pattern matching (switch expressions, is patterns)
+- Follow Microsoft naming: PascalCase public, _camelCase private fields
+
+## Design
+- Use dependency injection everywhere
+- Prefer interfaces for contracts, abstract classes only for shared implementation
+- Use Options pattern for configuration binding
+- Seal classes by default when they are not intended for inheritance
+- Exceptions (do not seal by default): EF Core entities, ASP.NET controllers/endpoints, and types explicitly designed for mocking/inheritance
+
+## Async
+- Use async/await for all I/O. Suffix async methods with "Async"
+- Use ValueTask<T> for hot paths completing synchronously
+- Never use .Result or .Wait() — deadlock risk
+- Use CancellationToken for all async operations that can block or do I/O
+- Prefer passing CancellationToken through the call chain; do not create new tokens unless you own the timeout/cancellation policy
+
+## Null Safety
+- Enable nullable reference types project-wide
+- Use ?. and ?? operators
+- Validate with ArgumentNullException.ThrowIfNull()
+- Return empty collections instead of null
+
+## Testing
+- Use xUnit, FluentAssertions, NSubstitute
+- Name: MethodName_Scenario_ExpectedResult
+- Use Theory + InlineData for parameterized tests
