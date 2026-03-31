@@ -1,12 +1,16 @@
 using BookingClone.Application.DTOs;
 using BookingClone.Application.Services;
+using BookingClone.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookingClone.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(IUserService userService) : ControllerBase
+public class UserController(
+    IUserService userService,
+    UserManager<ApplicationUser> userManager) : ControllerBase
 {
     [HttpGet("guest/{id}")]
     public async Task<ActionResult<GuestDto>> GetGuestById(Guid id)
@@ -56,6 +60,12 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<IActionResult> DeleteGuest(Guid id)
     {
         await userService.DeleteGuestAsync(id);
+        var identityDeletionResult = await DeleteIdentityUserIfExistsAsync(id);
+        if (identityDeletionResult is not null)
+        {
+            return identityDeletionResult;
+        }
+
         return NoContent();
     }
 
@@ -63,6 +73,33 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<IActionResult> DeleteStaff(Guid id)
     {
         await userService.DeleteStaffAsync(id);
+        var identityDeletionResult = await DeleteIdentityUserIfExistsAsync(id);
+        if (identityDeletionResult is not null)
+        {
+            return identityDeletionResult;
+        }
+
         return NoContent();
+    }
+
+    private async Task<IActionResult?> DeleteIdentityUserIfExistsAsync(Guid userId)
+    {
+        var identityUser = await userManager.FindByIdAsync(userId.ToString());
+        if (identityUser is null)
+        {
+            return null;
+        }
+
+        var deleteResult = await userManager.DeleteAsync(identityUser);
+        if (deleteResult.Succeeded)
+        {
+            return null;
+        }
+
+        var errors = deleteResult.Errors.Select(error => error.Description);
+        return Problem(
+            title: "Failed to delete identity user.",
+            detail: string.Join("; ", errors),
+            statusCode: StatusCodes.Status500InternalServerError);
     }
 }
