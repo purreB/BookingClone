@@ -1,9 +1,13 @@
-using Microsoft.EntityFrameworkCore;
 using BookingClone.Domain;
+using BookingClone.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookingClone.Infrastructure.Data;
 
-public class BookingCloneDbContext(DbContextOptions<BookingCloneDbContext> options) : DbContext(options)
+public class BookingCloneDbContext(DbContextOptions<BookingCloneDbContext> options)
+    : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>(options)
 {
     public DbSet<Hotel> Hotels { get; set; } = null!;
     public DbSet<HotelRoom> HotelRooms { get; set; } = null!;
