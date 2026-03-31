@@ -4,6 +4,8 @@ public interface IUserRepository
 {
     Task<Guest?> GetGuestByIdAsync(Guid id);
     Task<StaffUser?> GetStaffByIdAsync(Guid id);
+    Task<Guest?> GetGuestByEmailAsync(string email);
+    Task<StaffUser?> GetStaffByEmailAsync(string email);
     Task AddGuestAsync(Guest guest);
     Task AddStaffAsync(StaffUser staff);
     Task UpdateGuestAsync(Guest guest);

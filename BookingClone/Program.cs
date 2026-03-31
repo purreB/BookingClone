@@ -14,9 +14,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add database
 builder.Services.AddDbContext<BookingCloneDbContext>(options =>
+{
+    if (builder.Environment.IsEnvironment("Testing"))
+    {
+        options.UseInMemoryDatabase("BookingCloneTests");
+        return;
+    }
+
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("Neon")
-    )
+    );
+}
 );
 
 builder.Services.Configure<JwtOptions>(
@@ -97,7 +105,16 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<BookingCloneDbContext>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
-    dbContext.Database.Migrate();
+    if (app.Environment.IsEnvironment("Testing"))
+    {
+        dbContext.Database.EnsureDeleted();
+        dbContext.Database.EnsureCreated();
+    }
+    else
+    {
+        dbContext.Database.Migrate();
+    }
+
     await EnsureDefaultRolesAsync(roleManager);
 }
 
@@ -129,3 +146,4 @@ static async Task EnsureDefaultRolesAsync(RoleManager<IdentityRole<Guid>> roleMa
     }
 }
 
+public partial class Program;

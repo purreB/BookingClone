@@ -12,6 +12,12 @@ public class UserRepository(BookingCloneDbContext context) : IUserRepository
     public async Task<StaffUser?> GetStaffByIdAsync(Guid id) =>
         await context.StaffUsers.FirstOrDefaultAsync(s => s.Id == id);
 
+    public async Task<Guest?> GetGuestByEmailAsync(string email) =>
+        await context.Guests.FirstOrDefaultAsync(g => g.Email == email);
+
+    public async Task<StaffUser?> GetStaffByEmailAsync(string email) =>
+        await context.StaffUsers.FirstOrDefaultAsync(s => s.Email == email);
+
     public async Task AddGuestAsync(Guest guest)
     {
         context.Guests.Add(guest);

@@ -11,5 +11,4 @@ public class BookingDto
     public Guid HotelRoomId { get; set; }
     public DateTime CheckInDate { get; set; }
     public DateTime CheckOutDate { get; set; }
-    // Additional properties can be added as needed
 }
