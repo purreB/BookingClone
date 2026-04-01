@@ -1,37 +1,33 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BookingClone.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity;
+using BookingClone.Application.Abstractions.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BookingClone.Infrastructure.Auth;
 
-public sealed class JwtTokenService(
-    IOptions<JwtOptions> jwtOptions,
-    UserManager<ApplicationUser> userManager)
+public sealed class JwtTokenService(IOptions<JwtOptions> jwtOptions) : ITokenService
 {
-    public async Task<(string Token, DateTime ExpiresAtUtc, IReadOnlyList<string> Roles)> CreateTokenAsync(
-        ApplicationUser user,
+    public Task<TokenResult> CreateTokenAsync(
+        TokenPayload payload,
         CancellationToken cancellationToken)
     {
         var options = jwtOptions.Value;
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.SigningKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var roles = await userManager.GetRolesAsync(user);
 
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
-            new(JwtRegisteredClaimNames.Name, user.FullName),
+            new(JwtRegisteredClaimNames.Sub, payload.UserId.ToString()),
+            new(JwtRegisteredClaimNames.Email, payload.Email),
+            new(JwtRegisteredClaimNames.Name, payload.FullName),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Email, user.Email ?? string.Empty)
+            new(ClaimTypes.NameIdentifier, payload.UserId.ToString()),
+            new(ClaimTypes.Email, payload.Email)
         };
 
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+        claims.AddRange(payload.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var expiresAtUtc = DateTime.UtcNow.AddMinutes(options.AccessTokenMinutes);
         var token = new JwtSecurityToken(
@@ -41,6 +37,6 @@ public sealed class JwtTokenService(
             expires: expiresAtUtc,
             signingCredentials: creds);
 
-        return (new JwtSecurityTokenHandler().WriteToken(token), expiresAtUtc, roles.ToList());
+        return Task.FromResult(new TokenResult(new JwtSecurityTokenHandler().WriteToken(token), expiresAtUtc));
     }
 }

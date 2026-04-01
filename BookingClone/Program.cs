@@ -1,9 +1,19 @@
-using BookingClone.Application.Services;
-using BookingClone.Domain;
+using BookingClone.Application.Abstractions.Auth;
+using BookingClone.Application.Abstractions.Identity;
+using BookingClone.Application.Features.Auth;
+using BookingClone.Application.Features.Bookings;
+using BookingClone.Application.Features.HotelRooms;
+using BookingClone.Application.Features.Hotels;
+using BookingClone.Application.Features.Users;
+using BookingClone.Domain.Bookings.Repositories;
+using BookingClone.Domain.Hotels.Repositories;
+using BookingClone.Domain.Users.Repositories;
 using BookingClone.Infrastructure.Auth;
 using BookingClone.Infrastructure.Data;
 using BookingClone.Infrastructure.Identity;
-using BookingClone.Infrastructure.Repositories;
+using BookingClone.Infrastructure.Repositories.Bookings;
+using BookingClone.Infrastructure.Repositories.Hotels;
+using BookingClone.Infrastructure.Repositories.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -96,7 +106,8 @@ builder.Services.AddScoped<IHotelService, HotelService>();
 builder.Services.AddScoped<IHotelRoomService, HotelRoomService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<JwtTokenService>();
+builder.Services.AddScoped<IIdentityAccountService, IdentityAccountService>();
+builder.Services.AddScoped<ITokenService, JwtTokenService>();
 
 var app = builder.Build();
 

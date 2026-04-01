@@ -1,6 +1,8 @@
 using AutoMapper;
 using BookingClone.Application.DTOs;
-using BookingClone.Domain;
+using BookingClone.Domain.Bookings;
+using BookingClone.Domain.Hotels;
+using BookingClone.Domain.Users;
 
 namespace BookingClone.Application.Mappings;
 

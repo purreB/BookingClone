@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 using BookingClone.Tests.Infrastructure;
 using Xunit;
@@ -35,9 +37,10 @@ public sealed class AuthLifecycleTests : IClassFixture<TestWebApplicationFactory
         Assert.Equal(HttpStatusCode.OK, registerResponse.StatusCode);
 
         var registerBody = await registerResponse.Content.ReadFromJsonAsync<JsonElement>();
-        var userId = registerBody.GetProperty("userId").GetGuid();
         var accessToken = registerBody.GetProperty("accessToken").GetString();
         Assert.False(string.IsNullOrWhiteSpace(accessToken));
+        var jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(accessToken);
+        var userId = Guid.Parse(jwtToken.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value);
 
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
