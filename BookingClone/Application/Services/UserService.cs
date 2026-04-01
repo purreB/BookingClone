@@ -1,10 +1,15 @@
 using AutoMapper;
 using BookingClone.Application.DTOs;
 using BookingClone.Domain;
+using BookingClone.Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace BookingClone.Application.Services;
 
-public class UserService(IUserRepository userRepository, IMapper mapper) : IUserService
+public class UserService(
+    IUserRepository userRepository,
+    IMapper mapper,
+    UserManager<ApplicationUser> userManager) : IUserService
 {
     public async Task<GuestDto?> GetGuestByIdAsync(Guid id)
     {
@@ -18,41 +23,33 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
         return staff == null ? null : mapper.Map<StaffUserDto>(staff);
     }
 
-    public async Task<GuestDto> AddGuestAsync(GuestDto guestDto)
-    {
-        var guest = mapper.Map<Guest>(guestDto);
-        guest.Id = Guid.NewGuid();
-        await userRepository.AddGuestAsync(guest);
-        return mapper.Map<GuestDto>(guest);
-    }
-
-    public async Task<StaffUserDto> AddStaffAsync(StaffUserDto staffDto)
-    {
-        var staff = mapper.Map<StaffUser>(staffDto);
-        staff.Id = Guid.NewGuid();
-        await userRepository.AddStaffAsync(staff);
-        return mapper.Map<StaffUserDto>(staff);
-    }
-
-    public async Task UpdateGuestAsync(GuestDto guestDto)
-    {
-        var guest = mapper.Map<Guest>(guestDto);
-        await userRepository.UpdateGuestAsync(guest);
-    }
-
-    public async Task UpdateStaffAsync(StaffUserDto staffDto)
-    {
-        var staff = mapper.Map<StaffUser>(staffDto);
-        await userRepository.UpdateStaffAsync(staff);
-    }
-
-    public async Task DeleteGuestAsync(Guid id)
+    public async Task<IdentityOperationResult> DeleteGuestWithIdentityAsync(Guid id)
     {
         await userRepository.DeleteGuestAsync(id);
+        return await DeleteIdentityUserIfExistsAsync(id);
     }
 
-    public async Task DeleteStaffAsync(Guid id)
+    public async Task<IdentityOperationResult> DeleteStaffWithIdentityAsync(Guid id)
     {
         await userRepository.DeleteStaffAsync(id);
+        return await DeleteIdentityUserIfExistsAsync(id);
+    }
+
+    private async Task<IdentityOperationResult> DeleteIdentityUserIfExistsAsync(Guid userId)
+    {
+        var identityUser = await userManager.FindByIdAsync(userId.ToString());
+        if (identityUser is null)
+        {
+            return IdentityOperationResult.Success();
+        }
+
+        var deleteResult = await userManager.DeleteAsync(identityUser);
+        if (deleteResult.Succeeded)
+        {
+            return IdentityOperationResult.Success();
+        }
+
+        var errors = deleteResult.Errors.Select(error => error.Description);
+        return IdentityOperationResult.Failure(string.Join("; ", errors));
     }
 }
