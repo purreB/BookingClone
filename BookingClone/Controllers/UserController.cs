@@ -16,7 +16,14 @@ public class UserController(
     public async Task<ActionResult<GuestDto>> GetGuestById(Guid id)
     {
         var guest = await userService.GetGuestByIdAsync(id);
-        if (guest == null) return NotFound();
+        if (guest == null)
+        {
+            return Problem(
+                title: "Guest not found.",
+                detail: $"No guest exists with id '{id}'.",
+                statusCode: StatusCodes.Status404NotFound);
+        }
+
         return guest;
     }
 
@@ -24,7 +31,14 @@ public class UserController(
     public async Task<ActionResult<StaffUserDto>> GetStaffById(Guid id)
     {
         var staff = await userService.GetStaffByIdAsync(id);
-        if (staff == null) return NotFound();
+        if (staff == null)
+        {
+            return Problem(
+                title: "Staff user not found.",
+                detail: $"No staff user exists with id '{id}'.",
+                statusCode: StatusCodes.Status404NotFound);
+        }
+
         return staff;
     }
 
