@@ -43,9 +43,18 @@ public class AuthController(IAuthService authService) : ControllerBase
 
         return error.Type switch
         {
-            AuthErrorType.Validation => BadRequest(error.Message),
-            AuthErrorType.Conflict => Conflict(error.Message),
-            AuthErrorType.Unauthorized => Unauthorized(error.Message),
+            AuthErrorType.Validation => Problem(
+                title: "Validation failed.",
+                detail: error.Message,
+                statusCode: StatusCodes.Status400BadRequest),
+            AuthErrorType.Conflict => Problem(
+                title: "Conflict.",
+                detail: error.Message,
+                statusCode: StatusCodes.Status409Conflict),
+            AuthErrorType.Unauthorized => Problem(
+                title: "Unauthorized.",
+                detail: error.Message,
+                statusCode: StatusCodes.Status401Unauthorized),
             _ => Problem(
                 title: "Authentication request failed.",
                 detail: error.Message,
