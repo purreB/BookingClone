@@ -1,4 +1,6 @@
-using BookingClone.Domain;
+using BookingClone.Domain.Bookings;
+using BookingClone.Domain.Hotels;
+using BookingClone.Domain.Users;
 using BookingClone.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
