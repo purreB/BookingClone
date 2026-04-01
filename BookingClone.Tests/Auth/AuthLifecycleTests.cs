@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using BookingClone.Tests.Infrastructure;
@@ -35,9 +36,14 @@ public sealed class AuthLifecycleTests : IClassFixture<TestWebApplicationFactory
 
         var registerBody = await registerResponse.Content.ReadFromJsonAsync<JsonElement>();
         var userId = registerBody.GetProperty("userId").GetGuid();
+        var accessToken = registerBody.GetProperty("accessToken").GetString();
+        Assert.False(string.IsNullOrWhiteSpace(accessToken));
+
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
         var deleteResponse = await _client.DeleteAsync($"/api/user/guest/{userId}");
         Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+        _client.DefaultRequestHeaders.Authorization = null;
 
         var loginResponse = await _client.PostAsJsonAsync(
             "/api/auth/login",
@@ -83,5 +89,34 @@ public sealed class AuthLifecycleTests : IClassFixture<TestWebApplicationFactory
         var body = await response.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal("Guest not found.", body.GetProperty("title").GetString());
         Assert.Equal(404, body.GetProperty("status").GetInt32());
+    }
+
+    [Fact]
+    public async Task PostGuest_EndpointRemoved_ReturnsNotFound()
+    {
+        var response = await _client.PostAsJsonAsync(
+            "/api/user/guest",
+            new
+            {
+                name = "Removed Endpoint User",
+                email = "removed-endpoint@example.com"
+            });
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PutGuest_EndpointRemoved_ReturnsNotFound()
+    {
+        var response = await _client.PutAsJsonAsync(
+            "/api/user/guest",
+            new
+            {
+                id = Guid.NewGuid(),
+                name = "Removed Endpoint User",
+                email = "removed-endpoint@example.com"
+            });
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

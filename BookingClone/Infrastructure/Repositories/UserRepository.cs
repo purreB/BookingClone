@@ -30,18 +30,6 @@ public class UserRepository(BookingCloneDbContext context) : IUserRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task UpdateGuestAsync(Guest guest)
-    {
-        context.Guests.Update(guest);
-        await context.SaveChangesAsync();
-    }
-
-    public async Task UpdateStaffAsync(StaffUser staff)
-    {
-        context.StaffUsers.Update(staff);
-        await context.SaveChangesAsync();
-    }
-
     public async Task DeleteGuestAsync(Guid id)
     {
         var guest = await context.Guests.FindAsync(id);
