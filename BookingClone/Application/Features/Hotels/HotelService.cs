@@ -19,10 +19,11 @@ public class HotelService(IHotelRepository hotelRepository, IMapper mapper) : IH
         return hotel == null ? null : mapper.Map<HotelDto>(hotel);
     }
 
-    public async Task<HotelDto> AddHotelAsync(HotelDto hotelDto)
+    public async Task<HotelDto> AddHotelAsync(HotelDto hotelDto, Guid staffUserId)
     {
         var hotel = mapper.Map<Hotel>(hotelDto);
         hotel.Id = Guid.NewGuid();
+        hotel.OwnerId = staffUserId;
         await hotelRepository.AddAsync(hotel);
         return mapper.Map<HotelDto>(hotel);
     }

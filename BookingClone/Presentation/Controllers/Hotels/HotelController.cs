@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using BookingClone.Application.DTOs;
 using BookingClone.Application.Features.Hotels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookingClone.Presentation.Controllers.Hotels;
@@ -23,10 +25,20 @@ public class HotelController(IHotelService hotelService) : ControllerBase
         return hotel;
     }
 
+    [Authorize(Roles = "Staff")]
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] HotelDto hotel)
     {
-        var createdHotel = await hotelService.AddHotelAsync(hotel);
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var staffUserId))
+        {
+            return Problem(
+                title: "Unauthorized.",
+                detail: "User identifier is missing or invalid.",
+                statusCode: StatusCodes.Status401Unauthorized);
+        }
+
+        var createdHotel = await hotelService.AddHotelAsync(hotel, staffUserId);
         return CreatedAtAction(nameof(GetById), new { id = createdHotel.Id }, createdHotel);
     }
 

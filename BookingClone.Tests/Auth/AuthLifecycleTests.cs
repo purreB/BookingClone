@@ -9,7 +9,8 @@ using Xunit;
 
 namespace BookingClone.Tests.Auth;
 
-public sealed class AuthLifecycleTests : IClassFixture<TestWebApplicationFactory>
+[Collection("BookingCloneIntegration")]
+public sealed class AuthLifecycleTests
 {
     private readonly HttpClient _client;
 
